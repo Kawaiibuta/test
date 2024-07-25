@@ -1,4 +1,4 @@
-import { DocumentSnapshot } from "firebase-admin/firestore";
+import { DocumentSnapshot, Timestamp } from "firebase-admin/firestore";
 class User {
     id: string | undefined;
     name: string;
@@ -14,13 +14,15 @@ class User {
         snapshot: DocumentSnapshot,
     ): User {
         const data = snapshot.data()!;
-        return new User(data.id, data.name, data.dataOfBirth, data.email);
+        return new User(snapshot.id, data.name, data.dateOfBirth.toDate(), data.email);
     }
-    toObject(): Object {
-        return { id: this.id, name: this.name, dateOfBirth: this.dateOfBirth.toISOString(), email: this.email }
+    toObject(containId = true): Object {
+        if (containId)
+            return { id: this.id, name: this.name, dateOfBirth: this.dateOfBirth.toISOString(), email: this.email }
+        return { name: this.name, dateOfBirth: this.dateOfBirth.toISOString(), email: this.email }
     }
     static fromJson(json: any) {
-        if (json.name && json.id && json.email && json.dateOfBirth) {
+        if (json.name && json.email && json.dateOfBirth) {
             const dOB = new Date(Date.parse(json.dateOfBirth))
             if (!(dOB instanceof Date) || isNaN(dOB.getTime()))
                 throw new Error("Date of Birth is invalid")

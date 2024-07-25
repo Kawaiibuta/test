@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase-admin/firestore"
 import db from "../config/firebaseConfig"
 import ApiError from "../entities/ApiError"
 import User from "../reposiitory/userCollection"
@@ -9,14 +10,13 @@ export async function getUserData(id: string): Promise<User> {
     }
     return User.fromFirestore(userSnapshot)
 }
-export async function updateUserData(data: User): Promise<User> {
-    if (!data.id)
-        throw new ApiError("No ID", "The data doesn't contain id")
-    const userRef = await db.collection("users").doc(data.id)
+export async function updateUserData(id: string, data: User): Promise<User> {
+    const userRef = await db.collection("users").doc(id)
     var userSnapshot = await userRef.get();
     if (!userSnapshot.exists)
         throw new ApiError("Non-exist Entity", "The requested user is not existed")
-    return await userRef.update({...data.toObject()}).then((value) => {
+    return await userRef.update({...data.toObject(), dateOfBirth: Timestamp.fromDate(data.dateOfBirth)}).then((value) => {
+        data.id = id
         return data
     }).catch((reason) => {
         console.log(reason)

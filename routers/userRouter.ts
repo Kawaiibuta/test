@@ -4,7 +4,7 @@ import User from "../reposiitory/userCollection";
 import ApiError from "../entities/ApiError";
 const userRouter: Router = express.Router();
 userRouter.use(express.json())
-userRouter.post("/update-user-data", (req: Request, res: Response, next: NextFunction) => {
+userRouter.post("/update-user-data/:id", (req: Request, res: Response, next: NextFunction) => {
     //This is middleware to check the format of the request body
     // If it cannot be parse into a User => Invalid format
     // This split the error handling process into TypeError (middleware handle) and ApiError (Router handle)
@@ -21,7 +21,7 @@ userRouter.post("/update-user-data", (req: Request, res: Response, next: NextFun
 }, (req: Request, res: Response) => {
     try {
         var user = User.fromJson(req.body)
-        updateUserData(user).then((value) => {
+        updateUserData(req.params.id, user).then((value) => {
             res.send(value.toObject())
         }).catch((error) => {
             res.status(400).send((error as ApiError).message)
@@ -35,7 +35,7 @@ userRouter.post("/update-user-data", (req: Request, res: Response, next: NextFun
 
 userRouter.get("/fetch-user-data/:id", (req: Request, res: Response) => {
     getUserData(req.params.id).then((value) => {
-        res.send(value.toObject)
+        res.send(value.toObject())
     }).catch((error) => {
         res.status(400).send((error as ApiError).message)
     })
