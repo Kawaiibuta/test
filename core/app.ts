@@ -1,6 +1,8 @@
 import express, { Express, Request, Response } from 'express'
 import cors from 'cors';
-const app: Express = express();
+import { authMiddleware } from '../middleware/authMiddleware';
+import userRouter from '../routers/userRouter';
+export const app: Express = express();
 app.use(cors({ origin: true, credentials: true }))
 app.use((req: Request, res: Response, next: Function) => {
     // Website you wish to allow to connect
@@ -12,4 +14,8 @@ app.use((req: Request, res: Response, next: Function) => {
     );
     next();
 });
+
+app.use(authMiddleware)
+app.use("/", userRouter)
 export default app
+module.exports = app
