@@ -1,4 +1,4 @@
-import { DocumentSnapshot, Timestamp } from "firebase-admin/firestore";
+import { DocumentSnapshot } from "firebase-admin/firestore";
 class User {
     id: string | undefined;
     name: string;
@@ -18,8 +18,8 @@ class User {
     }
     toObject(containId = true): Object {
         if (containId)
-            return { id: this.id, name: this.name, dateOfBirth: this.dateOfBirth.toISOString(), email: this.email }
-        return { name: this.name, dateOfBirth: this.dateOfBirth.toISOString(), email: this.email }
+            return { id: this.id, name: this.name, dateOfBirth: this.dateOfBirth.toLocaleDateString(), email: this.email }
+        return { name: this.name, dateOfBirth: this.dateOfBirth.toLocaleDateString(), email: this.email }
     }
     static fromJson(json: any) {
         if (json.name && json.email && json.dateOfBirth) {
@@ -29,6 +29,7 @@ class User {
             return new User(json.id ?? null, json.name, dOB, json.email)
 
         }
+        console.log(json)
         throw new Error("Missing field")
     }
 }

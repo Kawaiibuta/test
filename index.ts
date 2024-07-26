@@ -2,7 +2,7 @@ import app from './core/app'
 import dotenv from 'dotenv'
 import { authMiddleware } from './middleware/authMiddleware';
 import userRouter from "./routers/userRouter"
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 1000;
 dotenv.config()
 app.use(authMiddleware)
 app.use("", userRouter)
