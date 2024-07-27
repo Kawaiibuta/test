@@ -1,5 +1,5 @@
 import express, { Router, Request, Response, NextFunction } from "express"
-import { getUserData, updateUserData } from "../controller/api";
+import { createUser, getUserData, updateUserData } from "../controller/api";
 import User from "../repository/userCollection";
 import ApiError from "../entities/ApiError";
 import { auth } from "../config/firebaseConfig";
@@ -51,5 +51,17 @@ userRouter.get("/fetch-user-data/", (req: Request, res: Response) => {
         })
     })
 
+})
+userRouter.post("/create-user", (req: Request, res: Response) => {
+    auth.verifyIdToken(req.header("Authorization")!.split(" ")[1]).then((decodedToken) => {
+        const data = req.body
+        createUser(decodedToken.uid, User.fromJson(data)).then((value) => {
+            return res.send(value.toObject())
+        }).catch((error) => {
+            console.log(error)
+            if (error instanceof ApiError) { return res.status(400).send((error as ApiError).message); }
+            return res.status(500).send("Unknown exception. "+ (error as Error).message)
+        })
+    })
 })
 export default userRouter
