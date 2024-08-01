@@ -8,9 +8,9 @@ COPY package-lock.json package-lock.json
 
 COPY tsconfig.json tsconfig.json
 
+COPY . .
 RUN npm install && npm install typescript -g
 
-
-RUN tsc
+RUN npm run build
 
 CMD [ "node", "./dist/index.js" ]
