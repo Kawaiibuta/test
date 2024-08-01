@@ -5,7 +5,7 @@ import ApiError from "../entities/ApiError";
 
 const cityRouter: Router = express.Router()
 
-cityRouter.get("", async (req, res) => {
+cityRouter.get("/", async (req, res) => {
     if (!req.query.param)
         res.json([])
     else

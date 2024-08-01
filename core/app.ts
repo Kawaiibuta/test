@@ -15,7 +15,7 @@ app.use((req: Request, res: Response, next: Function) => {
     next();
 });
 
-app.use("/", weatherRouter)
 app.use("/city", cityRouter)
+app.use("/", weatherRouter)
 export default app
 module.exports = app
