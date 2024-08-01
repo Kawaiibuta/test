@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express'
 import cors from 'cors';
-import { authMiddleware } from '../middleware/authMiddleware';
-import userRouter from '../routers/userRouter';
+import weatherRouter from '../routers/weatherRouter';
+import cityRouter from '../routers/cityRouter';
 export const app: Express = express();
 app.use(cors({ origin: true, credentials: true }))
 app.use((req: Request, res: Response, next: Function) => {
@@ -15,7 +15,7 @@ app.use((req: Request, res: Response, next: Function) => {
     next();
 });
 
-app.use(authMiddleware)
-app.use("/", userRouter)
+app.use("/", weatherRouter)
+app.use("/city", cityRouter)
 export default app
 module.exports = app

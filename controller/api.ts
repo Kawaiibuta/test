@@ -1,40 +1,64 @@
-import { Timestamp } from "firebase-admin/firestore"
-import { db } from "../config/firebaseConfig"
-import ApiError from "../entities/ApiError"
-import User from "../repository/userCollection"
-import { FirebaseError } from "firebase/app"
-export async function createUser(id: string, data: User): Promise<User> {
-    const userRef = db.collection("users").doc(id)
-    try {
-        const result = await userRef.set({ ...data.toObject(), dateOfBirth: Timestamp.fromDate(data.dateOfBirth) })
-        data.id = id
-        return data
-    }
-    catch (error) {
-        if (error instanceof FirebaseError)
-            throw new ApiError("Firebase error", (error as FirebaseError).message)
-        throw new ApiError("Unhandled error", (error as Error).message)
-    }
+import axios from "axios";
+import ApiError from "../entities/ApiError";
+import { Location } from "../repository/location";
+import { Weather } from "../repository/weather";
+import { ForeCast } from "../repository/forecast";
+
+export async function searchCity(param: string): Promise<Array<Omit<Location, "tz_id">>> {
+    let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `http://api.weatherapi.com/v1/search.json?key=${process.env.WEATHER_KEY}&q=${param}`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
+
+    return await axios.request(config)
+        .then((response) => {
+            return response.data as Array<Omit<Location, "tz_id">>
+        })
+        .catch((error) => {
+            const data = error.response.data
+            throw new ApiError(error.response.status, "Error on search City", data.message)
+        })
 }
-export async function getUserData(id: string): Promise<User> {
-    //TODO: retrieve data from firestore 
-    const userSnapshot = await db.collection("users").doc(id).get()
-    if (!userSnapshot.exists) {
-        throw new ApiError("Non-exist Entity", "The requested user is not existed")
-    }
-    return User.fromFirestore(userSnapshot)
+export async function getWeatherToday(location: string): Promise<Weather> {
+    let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_KEY}&q=${location}&days=${"1"}&aqi=no`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
+
+    return await axios.request(config)
+        .then((response) => {
+            return response.data
+        })
+        .catch((error) => {
+            const data = error.response.data
+            throw new ApiError(error.response.status, "Error on get weather today", data.message)
+        });
 }
-export async function updateUserData(id: string, data: User): Promise<User> {
-    console.log("Start update user" + id)
-    const userRef = await db.collection("users").doc(id)
-    var userSnapshot = await userRef.get();
-    if (!userSnapshot.exists)
-        throw new ApiError("Non-exist Entity", "The requested user is not existed")
-    return await userRef.update({ ...data.toObject(), dateOfBirth: Timestamp.fromDate(data.dateOfBirth) }).then((value) => {
-        data.id = id
-        return data
-    }).catch((reason) => {
-        console.log(reason)
-        throw new ApiError("FirebaseError", reason)
-    })
+
+export async function getWeatherForecast(location: string, day: number): Promise<Array<Weather & ForeCast>> {
+    let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `http://api.weatherapi.com/v1/forecast.json?key=${process.env.WEATHER_KEY}&q=${location}&days=${"1"}&aqi=no&alerts=no`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
+
+    return await axios.request(config)
+        .then((response) => {
+            return response.data as Array<Weather & ForeCast>
+        })
+        .catch((error) => {
+            const data = error.response.data
+            throw new ApiError(error.response.status, "Error on get weather today", data.message)
+        });
 }
