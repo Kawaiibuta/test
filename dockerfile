@@ -1,4 +1,5 @@
-FROM node:21.6.1
+FROM node:21.6.1-alpine
+FROM redis:latest-alpine
 
 WORKDIR /app
 
