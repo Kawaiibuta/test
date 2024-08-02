@@ -1,5 +1,5 @@
 FROM node:21.6.1
-RUN apt-get update && apt-get -y install redis-server
+RUN apt-get update && apt-get -y install redis
 
 WORKDIR /app
 
