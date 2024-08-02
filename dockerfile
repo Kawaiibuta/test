@@ -13,6 +13,6 @@ RUN npm install && npm install typescript -g
 
 RUN npm run build
 
-RUN chmod +x /bootstrap.sh
+RUN chmod +x /start.sh
 
-ENTRYPOINT ["/script.sh"]
+ENTRYPOINT ["/start.sh"]
