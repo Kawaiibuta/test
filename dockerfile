@@ -1,5 +1,5 @@
 FROM node:21.6.1-alpine
-FROM redis:latest-alpine
+RUN apt-get update && apt-get -y install redis-server
 
 WORKDIR /app
 
