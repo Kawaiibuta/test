@@ -1,6 +1,6 @@
 FROM node:21.6.1
 RUN apt-get update && apt-get -y install redis
-EXPOSE 6379
+RUN redis-server
 WORKDIR /app
 
 COPY package.json package.json
