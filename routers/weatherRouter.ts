@@ -2,25 +2,16 @@ import axios from "axios";
 import express, { Express, Router } from "express"
 import { getWeatherForecast, getWeatherToday, searchCity } from "../controller/api";
 import ApiError from "../entities/ApiError";
+import { validateWeatherRequest } from "../middleware/validateRequest";
+import { checkCachedWeather } from "../middleware/cacheMiddleware";
 
 const weatherRouter: Router = express.Router()
 
 //Middleware for check location before calling to the main API
-//This occur on every single call to the router
-//=> Need to save the location list to minimize response time
-weatherRouter.use(async (req, res, next) => {
-    if (!req.query.location)
-        res.status(400).send("Missing location query in url.")
-    try {
-        await searchCity(req.query.location as string)
-        next()
-    } catch (error) {
-        if (error instanceof ApiError)
-            res.status(error.status).json(error.toJSON())
-        else
-            res.status(500).send((error as Error).message)
-    }
-})
+//The first middleware check for the location query and save the request to Redis
+//The second middleware check for cached data
+weatherRouter.use(validateWeatherRequest)
+weatherRouter.use(checkCachedWeather)
 weatherRouter.get("/weather-today", async (req, res) => {
     try {
         const weatherToday = await getWeatherToday(req.query.location as string)

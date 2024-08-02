@@ -2,7 +2,9 @@ import express, { Express, Request, Response } from 'express'
 import cors from 'cors';
 import weatherRouter from '../routers/weatherRouter';
 import cityRouter from '../routers/cityRouter';
+import emailRouter from '../routers/emailRouter';
 export const app: Express = express();
+app.use(express.json());
 app.use(cors({ origin: true, credentials: true }))
 app.use((req: Request, res: Response, next: Function) => {
     // Website you wish to allow to connect
@@ -15,6 +17,7 @@ app.use((req: Request, res: Response, next: Function) => {
     next();
 });
 
+app.use("/email", emailRouter)
 app.use("/city", cityRouter)
 app.use("/", weatherRouter)
 export default app
