@@ -43,11 +43,11 @@ export async function getWeatherToday(location: string): Promise<Weather> {
         });
 }
 
-export async function getWeatherForecast(location: string, day: number): Promise<Array<Weather & ForeCast>> {
+export async function getWeatherForecast(location: string, day: number): Promise<Array< Weather | {forecast: ForeCast}>> {
     let config = {
         method: 'get',
         maxBodyLength: Infinity,
-        url: `http://api.weatherapi.com/v1/forecast.json?key=${process.env.WEATHER_KEY}&q=${location}&days=${"1"}&aqi=no&alerts=no`,
+        url: `http://api.weatherapi.com/v1/forecast.json?key=${process.env.WEATHER_KEY}&q=${location}&days=${day}&aqi=no&alerts=no`,
         headers: {
             'Content-Type': 'application/json',
         },
@@ -55,7 +55,7 @@ export async function getWeatherForecast(location: string, day: number): Promise
 
     return await axios.request(config)
         .then((response) => {
-            return response.data as Array<Weather & ForeCast>
+            return response.data as Array<Weather | {forecast: ForeCast}>
         })
         .catch((error) => {
             const data = error.response.data

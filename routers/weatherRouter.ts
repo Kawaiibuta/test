@@ -44,7 +44,7 @@ weatherRouter.get("/weather-today", async (req, res) => {
 })
 weatherRouter.get("/weather-forecast", async (req, res) => {
     try {
-        const result = await getWeatherForecast(req.query.location as string, req.query.day ? Number.parseInt(req.query.day as string) : 4)
+        const result = await getWeatherForecast(req.query.location as string, req.query.day ? Number.parseInt(req.query.days as string) : 5)
         res.status(200).send(result)
     } catch (error) {
         if (error instanceof ApiError)
